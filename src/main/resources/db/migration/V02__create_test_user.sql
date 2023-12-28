@@ -1,0 +1,2 @@
+
+insert into receba.users (id, email, password, username, user_creation_date) values (gen_random_uuid(), 'nikolas@nikolas', '$2a$12$wfew1NxgJx6dGzJ6qG38leNdK2xX1tHJB4.L4sJX6woHG/9J5/AqS', 'nikolas', current_timestamp);
