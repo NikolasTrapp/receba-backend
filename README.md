@@ -38,7 +38,7 @@
   </p>
 </p>
 
-Receive (backend) is an application that I am developing with the intention of studying a bit and passing the time, especially spending time. In this project, my goal is to develop a social network similar to X or Facebook but with a humorous tone that will be present when creating posts. I did the modeling off the top of my head, and it will likely change significantly as the project progresses.
+Receba (backend) is an application that I am developing with the intention of studying a bit and passing the time, especially spending time. In this project, my goal is to develop a social network similar to X or Facebook but with a humorous tone that will be present when creating posts. I did the modeling off the top of my head, and it will likely change significantly as the project progresses.
 
 There's a not-so-remote possibility that the frontend may not be developed, but I will make an effort for it to happen.
 
