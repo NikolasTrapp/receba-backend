@@ -1,5 +1,5 @@
 <p align="center">
- <h2 align="center">RECEBA BACKEND</h2>
+ <h1 align="center">RECEBA BACKEND</h2>
  <!-- <p align="center">TODO: SIMPLE DESCRIPTION</p> -->
 </p>
   <p align="center">
