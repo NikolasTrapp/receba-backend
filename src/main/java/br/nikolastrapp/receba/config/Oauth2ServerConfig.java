@@ -1,5 +1,7 @@
 package br.nikolastrapp.receba.config;
 
+import br.nikolastrapp.receba.entities.RoleEntity;
+import br.nikolastrapp.receba.repositories.UserRepository;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
@@ -10,31 +12,25 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.OAuth2TokenFormat;
+import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
-import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.JdbcRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
-import org.springframework.security.oauth2.server.authorization.config.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
-import org.springframework.security.oauth2.server.authorization.config.TokenSettings;
+import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 
-import java.io.InputStream;
 import java.security.KeyStore;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Configuration
 @RequiredArgsConstructor
@@ -52,26 +48,8 @@ public class Oauth2ServerConfig {
     }
 
     @Bean
-    public RegisteredClientRepository registeredClientRepository(PasswordEncoder passwordEncoder) {
-        var recebaFrontend = RegisteredClient
-                .withId(UUID.randomUUID().toString())
-                .clientId("receba-frontend")
-                .clientSecret(passwordEncoder.encode("receba"))
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .scope("READ")
-                .scope("WRITE")
-                .tokenSettings(TokenSettings.builder()
-                        .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
-                        .accessTokenTimeToLive(Duration.ofMinutes(30))
-                        .build())
-                .redirectUri("http://127.0.0.1:8080/authorized")
-                .clientSettings(ClientSettings.builder()
-                        .requireAuthorizationConsent(false)
-                        .build())
-                .build();
-
-        return new InMemoryRegisteredClientRepository(Arrays.asList(recebaFrontend));
+    public RegisteredClientRepository registeredClientRepository(JdbcOperations jdbcOperations) {
+        return new JdbcRegisteredClientRepository(jdbcOperations);
     }
 
     @Bean
@@ -89,16 +67,36 @@ public class Oauth2ServerConfig {
     @Bean
     public JWKSource<SecurityContext> jwkSource(RecebaSecurityProperties properties) throws Exception {
         char[] keyStorePass = properties.getPassword().toCharArray();
-        String keypairAlias = properties.getKeypairAlias();
+        var keypairAlias = properties.getKeypairAlias();
 
-        Resource jksResource = properties.getJksLocation();
-        InputStream inputStream = jksResource.getInputStream();
-        KeyStore keyStore = KeyStore.getInstance("JKS");
+        var jksResource = properties.getJksLocation();
+        var inputStream = jksResource.getInputStream();
+        var keyStore = KeyStore.getInstance("JKS");
         keyStore.load(inputStream, keyStorePass);
 
-        RSAKey rsaKey = RSAKey.load(keyStore, keypairAlias, keyStorePass);
+        var rsaKey = RSAKey.load(keyStore, keypairAlias, keyStorePass);
 
         return new ImmutableJWKSet<>(new JWKSet(rsaKey));
     }
 
+    @Bean
+    public OAuth2TokenCustomizer<JwtEncodingContext> jwtEncodingContextOAuth2TokenCustomizer(UserRepository userRepository) {
+        return context -> {
+            var authentication = context.getPrincipal();
+            if (authentication.getPrincipal() instanceof User) {
+                var user = (User) authentication.getPrincipal();
+
+                var userEntity = userRepository.findByEmailOrUsername(user.getUsername()).orElseThrow();
+                var authorities = userEntity.getAuthorities().stream().map(RoleEntity::getAuthority).collect(Collectors.toSet());
+
+                context.getClaims().claim("user_id", userEntity.getId().toString());
+                context.getClaims().claim("authorities", authorities);
+            }
+        };
+    }
+
+    @Bean
+    public OAuth2AuthorizationConsentService oAuth2AuthorizationConsentService(JdbcOperations jdbcOperations, RegisteredClientRepository registeredClientRepository) {
+        return new JdbcOAuth2AuthorizationConsentService(jdbcOperations, registeredClientRepository);
+    }
 }

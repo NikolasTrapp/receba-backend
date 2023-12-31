@@ -124,19 +124,31 @@ CREATE TABLE oauth2_authorization
 ------------------------------------------------------------------------------------------------------------------------
 
 ------------------------------------------------------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS oauth_client_details
+CREATE TABLE oauth2_registered_client
 (
-    client_id               VARCHAR(255) PRIMARY KEY,
-    resource_ids            VARCHAR(256),
-    client_secret           VARCHAR(256),
-    scope                   VARCHAR(256),
-    authorized_grant_types  VARCHAR(256),
-    web_server_redirect_uri VARCHAR(256),
-    authorities             VARCHAR(256),
-    access_token_validity   INTEGER,
-    refresh_token_validity  INTEGER,
-    additional_information  VARCHAR(4096),
-    autoapprove             VARCHAR(256)
+    id                            varchar(100)                            NOT NULL,
+    client_id                     varchar(100)                            NOT NULL,
+    client_id_issued_at           timestamp     DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    client_secret                 varchar(200)                            DEFAULT NULL,
+    client_secret_expires_at      timestamp                               DEFAULT NULL,
+    client_name                   varchar(200)                            NOT NULL,
+    client_authentication_methods varchar(1000)                           NOT NULL,
+    authorization_grant_types     varchar(1000)                           NOT NULL,
+    redirect_uris                 varchar(1000)                           DEFAULT NULL,
+    scopes                        varchar(1000)                           NOT NULL,
+    client_settings               varchar(2000)                           NOT NULL,
+    token_settings                varchar(2000)                           NOT NULL,
+    PRIMARY KEY (id)
+);
+------------------------------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------------------------------
+CREATE TABLE oauth2_authorization_consent
+(
+    registered_client_id varchar(100)  NOT NULL,
+    principal_name       varchar(200)  NOT NULL,
+    authorities          varchar(1000) NOT NULL,
+    PRIMARY KEY (registered_client_id, principal_name)
 );
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -148,7 +160,8 @@ CREATE TABLE IF NOT EXISTS oauth_code
 );
 ------------------------------------------------------------------------------------------------------------------------
 
-
+-- Users Table
+------------------------------------------------------------------------------------------------------------------------
 ALTER TABLE receba.users
     DROP CONSTRAINT IF EXISTS pk_user_id,
     ADD CONSTRAINT pk_user_id PRIMARY KEY (id);
