@@ -1,4 +1,4 @@
-package br.nikolastrapp.receba.config;
+package br.nikolastrapp.receba.services.impl;
 
 import br.nikolastrapp.receba.entities.UserEntity;
 import br.nikolastrapp.receba.repositories.UserRepository;
@@ -24,14 +24,14 @@ public class JpaUserDetailsService implements UserDetailsService {
     @Transactional(readOnly = true)
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity user = userRepository.findByEmailOrUsername(username)
+        var user = userRepository.findByEmailOrUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        return new User(user.getEmail(), user.getPassword(), getAuthorities(user));
+        return new User(user.getSignedUpUsername(), user.getPassword(), getAuthorities(user));
     }
 
-    private Collection<GrantedAuthority> getAuthorities(UserEntity usuario) {
-        return usuario.getAuthorities().stream()
+    private Collection<GrantedAuthority> getAuthorities(UserEntity user) {
+        return user.getAuthorities().stream()
                 .map(authority -> new SimpleGrantedAuthority(authority.getAuthority().toUpperCase()))
                 .collect(Collectors.toSet());
     }

@@ -1,4 +1,4 @@
-package br.nikolastrapp.receba.handler;
+package br.nikolastrapp.receba.controlers;
 
 import br.nikolastrapp.receba.services.NotificationService;
 import lombok.AllArgsConstructor;
@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/notification")
-public class NotificationHandler {
+@RequestMapping("/api/notification")
+public class NotificationController {
 
     private final NotificationService notificationService;
 }

@@ -45,9 +45,9 @@ services:
       timeout: 5s
       retries: 3
 
-  receba-application:
+  receba-backend:
     image: receba:0.0.1
-    container_name: receba
+    container_name: receba-backend
     ports:
       - 8080:8080
     depends_on:
@@ -58,17 +58,51 @@ services:
       redis:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/receba_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_RABBITMQ_PORT: 5672
-      SPRING_RABBITMQ_USERNAME: admin
-      SPRING_RABBITMQ_PASSWORD: admin
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/receba_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DEFAULT_SCHEMA=receba
+      - SPRING_JPA_HIBERNATE_DDL-AUTO=none
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=admin
+      - SPRING_RABBITMQ_PASSWORD=admin
+      - SERVER_PORT=8080
+      - SPRING_JPA_SHOW-SQL=false
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health
+      - MANAGEMENT_HEALTH_RABBIT_ENABLED=false
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_OPAQUE-TOKEN_INTROSPECTION-URI=http://localhost:8080/oauth2/introspect
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_OPAQUE-TOKEN_CLIENT-ID=receba-frontend
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_OPAQUE-TOKEN_CLIENT-SECRET=receba
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI=http://localhost:8080/oauth2/jwks
+      - RECEBA_SECURITY_JKSLOCATION=classpath:keystore/receba.jks
+      - RECEBA_SECURITY_PASSWORD=receba
+      - RECEBA_SECURITY_KEYPAIR-ALIAS=receba
+      - SPRING_FLYWAY_URL=jdbc:postgresql://postgres:5432/receba_db
+      - SPRING_FLYWAY_USER=postgres
+      - SPRING_FLYWAY_PASSWORD=postgres
+      - SPRING_FLYWAY_LOCATIONS=classpath:db/migration
+      - RECEBA_SECURITY_PROVIDER-URL=http://localhost:8080
     healthcheck:
       test: [ "CMD-SHELL", "curl --fail http://localhost:8080/actuator/health || exit 1" ]
       interval: 10s
       timeout: 5s
+      retries: 3
+    networks:
+      - receba_network
+
+  receba-frontend:
+    image: receba-frontend:0.0.1
+    container_name: receba-frontend
+    ports:
+      - "4200:80"
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/health" ]
+      interval: 30s
+      timeout: 3s
       retries: 3
     networks:
       - receba_network

@@ -1,15 +1,14 @@
-package br.nikolastrapp.receba.handler;
+package br.nikolastrapp.receba.controlers;
 
 import br.nikolastrapp.receba.services.PostService;
-import br.nikolastrapp.receba.services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/post")
-public class PostHandler {
+@RequestMapping("/api/post")
+public class PostController {
 
     private final PostService postService;
     ;

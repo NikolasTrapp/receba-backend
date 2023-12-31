@@ -1,4 +1,4 @@
-package br.nikolastrapp.receba.handler;
+package br.nikolastrapp.receba.controlers;
 
 import br.nikolastrapp.receba.services.FollowerService;
 import lombok.AllArgsConstructor;
@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/follower")
-public class FollowerHandler {
+@RequestMapping("/api/follower")
+public class FollowerController {
 
     private final FollowerService followerService;
 }

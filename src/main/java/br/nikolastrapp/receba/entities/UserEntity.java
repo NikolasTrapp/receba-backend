@@ -1,6 +1,5 @@
 package br.nikolastrapp.receba.entities;
 
-import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,8 +7,12 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 import static br.nikolastrapp.receba.utils.StringUtils.isEmpty;
 
@@ -30,14 +33,15 @@ public class UserEntity {
     @Column(nullable = false, unique = true)
     private String username;
 
+    @Column(unique = true, nullable = false)
+    private String email;
+
     @Column
     private String avatar;
 
     @Column(unique = true)
     private String phone;
 
-    @Column(unique = true, nullable = false)
-    private String email;
 
     @Column(nullable = false)
     private String password;
@@ -72,6 +76,10 @@ public class UserEntity {
             schema = "receba"
     )
     private Set<RoleEntity> authorities;
+
+    public String getSignedUpUsername() {
+        return isEmpty(getEmail()) ? getUsername() : getEmail();
+    }
 
     @Override
     public boolean equals(Object o) {
