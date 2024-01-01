@@ -1,6 +1,6 @@
 <p align="center">
- <h1 align="center">RECEBA BACKEND</h2>
- <!-- <p align="center">TODO: SIMPLE DESCRIPTION</p> -->
+ <h2 align="center">RECEBA BACKEND</h2>
+ <!-- <p align="center">TODO: DESCRIÇÃO SIMPLES</p> -->
 </p>
   <p align="center">
     <a href="https://github.com/NikolasTrapp/receba-backend/graphs/contributors">
@@ -38,11 +38,11 @@
   </p>
 </p>
 
-Receba (backend) is an application that I am developing with the intention of studying a bit and passing the time, especially spending time. In this project, my goal is to develop a social network similar to X or Facebook but with a humorous tone that will be present when creating posts. I did the modeling off the top of my head, and it will likely change significantly as the project progresses.
+Receba (backend) é uma aplicação que estou desenvolvendo com o intuito de estudar um pouco e passar o tempo, principalemente passar um tempo, neste projeto tenho como objetivo desenvolver uma rede social semelhante ao X ou Facebook, porém com um tom de humor que estará na hora de criar posts. A modelagem fiz de cabeça e provavelmente vai mudar bastante com o andar do projeto.
 
-There's a not-so-remote possibility that the frontend may not be developed, but I will make an effort for it to happen.
+Existe uma chance não tão remota do frontend não ser desenvolvido, porém farei esforço para que seja.
 
-I will reveal the proposal and humorous tone of this application in the future. I want to play a joke on my friends, and for that reason, I can't share it yet. In the future, I'll create a more polished README.MD because I started developing it today at 8:00 PM, and it's already 11:37 PM, so please be content with this for now.
+A proposta e o tom humorístico dessa aplicação irei revelar futuramente, quero fazer uma brincadeira com meus amigos e para isso não posso compartilhar ainda. Futuramente faço um README.MD mais bonito pois eu comecei a desenvolver hoje as 20:00 e já são 23:37, portanto, se contentem com esse.
 
 ![Linux meme](https://ih1.redbubble.net/image.467469235.0994/flat,750x1000,075,t.u2.jpg)
-![Bricklayer's glove](https://img.r7.com/images/luva-de-pedreiro-05082022164820688?dimensions=771x420&no_crop=true)
+![Luva de predeiro](https://img.r7.com/images/luva-de-pedreiro-05082022164820688?dimensions=771x420&no_crop=true)
