@@ -29,12 +29,11 @@ import static java.util.Optional.ofNullable;
 public class UserServiceImpl implements UserService {
 
     private static final String USER_AUTHORITY = "USER";
-    private static final String WEB_CLIENT_ID = "receba-frontend";
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final RedisService redisService;
     private final PasswordEncoder passwordEncoder;
+    private final RedisService redisService;
 
     @Transactional
     @Override
@@ -55,6 +54,11 @@ public class UserServiceImpl implements UserService {
             log.error("Could not register user '{}'.", newUser.getUsername(), err);
             throw new UserException("Could not complete user sign up.", err);
         }
+    }
+
+    @Override
+    public Set<UserEntity> findUsersByUsername(String username) {
+        return userRepository.findAllByUsernameLikeIgnoreCase(username); //TODO USAR PAGINAÇÃO
     }
 
     private UserEntity convertUserToUserEntity(UserSignUpDTO user) {

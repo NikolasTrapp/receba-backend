@@ -7,6 +7,9 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -25,12 +28,13 @@ public class ResourceServerConfig {
         http
                 .authorizeRequests()
                 .antMatchers("/api/user/register", "/h2-console/**", "/actuator/health").permitAll()
-                .antMatchers("/oauth2/**").authenticated()
                 .anyRequest().authenticated()
             .and()
             .csrf().disable()
             .cors().disable()
-            .oauth2ResourceServer().jwt().jwtAuthenticationConverter(jwtAuthenticationConverter());
+            .oauth2ResourceServer(resourceServer -> {
+                resourceServer.jwt().jwtAuthenticationConverter(jwtAuthenticationConverter());
+            }).oauth2Login();
 
         return http.formLogin(Customizer.withDefaults()).build();
     }
@@ -51,4 +55,11 @@ public class ResourceServerConfig {
         });
         return converter;
     }
+
+//    @Bean
+//    public JwtDecoder jwtDecoder() {
+//        return NimbusJwtDecoder
+//                .withJwkSetUri(jwkSetUri)
+//                .jwsAlgorithm(SignatureAlgorithm.RS256).build();
+//    }
 }
